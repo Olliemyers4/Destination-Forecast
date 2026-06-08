@@ -16,5 +16,7 @@ If developing on this repo, also install the development packages via:
 The notebook `dataset_exploration.ipynb` is used to explore the datasets provided.
 
 The aim of the notebook is to demonsrate the process taken to understand the datasets thoroughly
+The below VS Code extension alongside the notebooks allows for a more interactive view of tables produced by code cells: 
+[VS Code Extension](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.datawrangler)
 
 ## Destination Forecast Model
