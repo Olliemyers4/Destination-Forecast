@@ -1,3 +1,4 @@
 black==26.5.1
+black[jupyter]
 isort==8.0.1
 mypy==2.1.0
