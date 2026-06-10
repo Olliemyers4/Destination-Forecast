@@ -107,7 +107,10 @@ class ForecasterTrainer:
                 step=epoch,
             )
         torch.save(self.model.state_dict(), f"{name}.pth")
-        self.evaluate_model()
+        correct = self.evaluate_model()
+        self.mlflow.log_metrics(
+            {"final_score": correct / self.test_loader.__len__()}, step=epochs
+        )
 
     def validate_model(self) -> tuple[float, int]:
         self.model.eval()
@@ -124,13 +127,18 @@ class ForecasterTrainer:
         self.model.train()
         return validation_loss, validation_batches
 
-    def evaluate_model(self):
+    def evaluate_model(self) -> int:
         self.model.eval()
         with torch.no_grad():
             correct = 0
             for i, (data, label) in enumerate(self.test_loader):
                 data = data.to(self.device)
                 label = label.to(self.device)
+                predicted = self.model(data)
+                tol_lat = 0.01  # very rough approximates
+                tol_lon = 0.01
 
-                _ = self.model(data)
+                diff = (predicted[:, :2] - label[:, :2]).abs()
+
+                correct = ((diff[:, 0] < tol_lat) & (diff[:, 1] < tol_lon)).sum().item()
         return correct

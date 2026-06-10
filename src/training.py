@@ -47,10 +47,10 @@ with mlflow.start_run():
         test_y=test_y,
         valid_x=valid_x,
         valid_y=valid_y,
-        optimiser=torch.optim.Adam(model.parameters(), lr=0.01),
+        optimiser=torch.optim.Adam(model.parameters(), lr=0.005),
         criterion=torch.nn.MSELoss(),
         device="cpu",
         mlflow=mlflow,
     )
 
-    trainer.train_model(100, "lstm_forecaster")
+    trainer.train_model(30, "lstm_forecaster")
