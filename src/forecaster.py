@@ -7,7 +7,7 @@ import torch
 class Dataset(torch.utils.data.Dataset):
     def __init__(self, data: np.ndarray, label: np.ndarray) -> None:
         self.data = torch.from_numpy(data.astype("float32"))
-        self.label = torch.from_numpy(label).long()
+        self.label = torch.from_numpy(label).float()
 
     def __len__(self) -> int:
         return self.data.shape[0]
@@ -23,16 +23,18 @@ class LSTMForecaster(torch.nn.Module):
         hidden_size: int,
         lstm_layers: int,
         output_size: int,
-        activation: types.FunctionType,
+        activation: torch.nn.Module,
     ) -> None:
         super(LSTMForecaster, self).__init__()
-        self.lstm = torch.nn.LSTM(input_size, hidden_size, lstm_layers)
+        self.lstm = torch.nn.LSTM(
+            input_size, hidden_size, lstm_layers, batch_first=True
+        )
         self.fc1 = torch.nn.Linear(hidden_size, output_size)
         self.activation = activation
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = self.activation(self.lstm(x))  # type: ignore
-        x = self.fc1(x)
+        x, _ = self.lstm(x)  # type: ignore
+        x = self.activation(self.fc1(x[:, -1, :]))
         return x
 
 
@@ -81,31 +83,54 @@ class ForecasterTrainer:
         self.device = device
         self.mlflow = mlflow
 
-    def train_model(self, epochs: int) -> None:
-        for _ in range(epochs):
+    def train_model(self, epochs: int, name: str) -> None:
+        for epoch in range(epochs):
+            self.model.train()
             loss = 0.0
+            batches = 0
             for _, (data, label) in enumerate(self.train_loader):
                 data = data.to(self.device)
                 label = label.to(self.device)
-
                 self.optimiser.zero_grad()
                 output = self.model(data)
                 losses = self.criterion(output, label)
                 losses.backward()
                 self.optimiser.step()
                 loss += losses.item()
-            self.validate_model()
+                batches += 1
+            validation_loss, validation_batches = self.validate_model()
+            self.mlflow.log_metrics(
+                {
+                    "training_loss": loss / batches,
+                    "validation_loss": validation_loss / validation_batches,
+                },
+                step=epoch,
+            )
+        torch.save(self.model.state_dict(), f"{name}.pth")
+        self.evaluate_model()
 
-    def validate_model(self) -> float:
+    def validate_model(self) -> tuple[float, int]:
         self.model.eval()
         validation_loss = 0.0
+        validation_batches = 0
         with torch.no_grad():
             for _, (data, label) in enumerate(self.valid_loader):
                 data = data.to(self.device)
                 label = label.to(self.device)
-
                 output = self.model(data)
                 losses = self.criterion(output, label)
                 validation_loss += losses.item()
+                validation_batches += 1
         self.model.train()
-        return validation_loss
+        return validation_loss, validation_batches
+
+    def evaluate_model(self):
+        self.model.eval()
+        with torch.no_grad():
+            correct = 0
+            for i, (data, label) in enumerate(self.test_loader):
+                data = data.to(self.device)
+                label = label.to(self.device)
+
+                _ = self.model(data)
+        return correct

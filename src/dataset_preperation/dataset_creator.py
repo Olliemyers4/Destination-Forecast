@@ -115,7 +115,7 @@ for vessel in calls_and_vessels["vessel_id"].unique():
         else:
             calls_and_vessels.loc[i, "next_port_lat"] = next_lat
             calls_and_vessels.loc[i, "next_port_lon"] = next_long
-            calls_and_vessels.loc[i, "next_port_capacity"] = next_long
+            calls_and_vessels.loc[i, "next_port_capacity"] = next_capacity
 
             next_lat = row["destination_latitude"]
             next_long = row["destination_longitude"]
@@ -155,7 +155,7 @@ shuffle(unique_vessels)
 
 full_len = len(unique_vessels)
 split_at = int(full_len * 0.7)
-split_at_2 = full_len + int((full_len - split_at) / 2)
+split_at_2 = split_at + int((full_len - split_at) / 2)
 
 train = unique_vessels[0:split_at]
 test = unique_vessels[split_at:split_at_2]

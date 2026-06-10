@@ -58,7 +58,7 @@ def data_split(
         df["vessel_type"], categories=VESSEL_TYPES
     ).codes / len(VESSEL_TYPES)
 
-    df["flag_continet_enc"] = pd.Categorical(
+    df["flag_continent_enc"] = pd.Categorical(
         df["flag_continent"], categories=CONTINETS
     ).codes / len(CONTINETS)
 
@@ -66,11 +66,11 @@ def data_split(
     df["capacity"] = df["capacity"].clip(upper=1)
     df["next_port_capacity"] = df["next_port_capacity"].clip(upper=1)
 
-    df["desination_latitude"] = (
-        df["desination_latitude"] + 90
+    df["destination_latitude"] = (
+        df["destination_latitude"] + 90
     ) / 180  # [-90, 90] -> [0, 1]
-    df["desination_longitude"] = (
-        df["desination_longitude"] + 180
+    df["destination_longitude"] = (
+        df["destination_longitude"] + 180
     ) / 360  # [-180, 180] -> [0, 1]
 
     df["next_port_lat"] = (df["next_port_lat"] + 90) / 180  # [-90, 90] -> [0, 1]
@@ -78,6 +78,7 @@ def data_split(
 
     df["previous_port_type"] = df["previous_port_type"] / 4  # 4 values
     df["current_port_type"] = df["current_port_type"] / 4  # 4 values
+    df = df.dropna()
 
     X_list, y_list = [], []
 
