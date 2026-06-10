@@ -146,3 +146,27 @@ split_at_2 = full_len + int((full_len - split_at) / 2)
 train = unique_vessels[0:split_at]
 test = unique_vessels[split_at:split_at_2]
 validation = unique_vessels[split_at_2:]
+
+calls_and_vessels = calls_and_vessels[
+    [
+        "vessel_id",
+        "capacity",
+        "destination_latitude",
+        "destination_longitude",
+        "vessel_type",
+        "previous_port_type",
+        "current_port_type",
+        "flag_continent",
+        "next_port_lat",
+        "next_port_lon",
+        "next_port_capacity",
+    ]
+]
+
+calls_and_vessels[calls_and_vessels["vessel_id"].isin(train)].to_csv("train.csv")
+
+calls_and_vessels[calls_and_vessels["vessel_id"].isin(test)].to_csv("test.csv")
+
+calls_and_vessels[calls_and_vessels["vessel_id"].isin(validation)].to_csv(
+    "validation.csv"
+)
