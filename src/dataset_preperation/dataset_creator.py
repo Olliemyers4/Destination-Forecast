@@ -134,6 +134,14 @@ calls_and_vessels = calls_and_vessels[
     & (calls_and_vessels["next_port_capacity"] != -1)
 ]
 
+# Drop rows with less than 3 journeys
+to_drop = []
+for vessel_id in calls_and_vessels["vessel_id"].unique():
+    if len(calls_and_vessels[calls_and_vessels["vessel_id"] == vessel_id]) < 3:
+        to_drop.append(vessel_id)
+
+calls_and_vessels = calls_and_vessels[~calls_and_vessels["vessel_id"].isin(to_drop)]
+
 # Split into train test and validation splits
 # 70 15 15 split
 unique_vessels = calls_and_vessels["vessel_id"].unique()
