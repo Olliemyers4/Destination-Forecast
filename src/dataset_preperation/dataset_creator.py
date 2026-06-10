@@ -139,6 +139,12 @@ to_drop = []
 for vessel_id in calls_and_vessels["vessel_id"].unique():
     if len(calls_and_vessels[calls_and_vessels["vessel_id"] == vessel_id]) < 3:
         to_drop.append(vessel_id)
+    elif any(
+        calls_and_vessels[calls_and_vessels["vessel_id"] == vessel_id][
+            "destination_longitude"
+        ].isnull()
+    ):
+        to_drop.append(vessel_id)
 
 calls_and_vessels = calls_and_vessels[~calls_and_vessels["vessel_id"].isin(to_drop)]
 
