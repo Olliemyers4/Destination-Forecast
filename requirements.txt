@@ -3,5 +3,3 @@ pandas==3.0.3
 matplotlib==3.10.9
 ipykernel==7.2.0
 basemap==2.0.0
-reverse_geocoder==1.5.1
-pycountry==26.2.16
