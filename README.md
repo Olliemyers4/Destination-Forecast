@@ -15,8 +15,25 @@ If developing on this repo, also install the development packages via:
 
 The notebook `dataset_exploration.ipynb` is used to explore the datasets provided.
 
-The aim of the notebook is to demonsrate the process taken to understand the datasets thoroughly
+The aim of the notebook is to demonstrate the process taken to understand the datasets thoroughly
 The below VS Code extension alongside the notebooks allows for a more interactive view of tables produced by code cells: 
 [VS Code Extension](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.datawrangler)
 
+Investigation into dataset revealed a number of patterns that could be exploited for forecasting destinations
+
 ## Destination Forecast Model
+
+The segment of this repository under `/src/` aims to create an early prototype of a model to predict the next destination of a vessel.
+
+Files:
+
+- `src/forecaster.py` All the classes and methods needed for executing training
+
+- `src/training.py` Instantiation of classes and calling of the training
+
+- `src/dataset_preparation/dataset_creator.py` Generates train test validation splits
+
+- `src/dataset_preparation/dataset_data_label_split.pt` Utility function to split data files into data and labels
+
+
+
